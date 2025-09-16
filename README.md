@@ -7,6 +7,9 @@ NeuralFoil is a neural network model of airfoil performance trained on a large s
 This library version of NeuralFoil is intended for tight integration into C++ programs without introducing a Python
 dependency on the resulting binary.
 
+libNeuralFoil is currently based on NeuralFoil version 0.3.2.  It may be updated in the future as NeuralFoil continues
+to be developed.
+
 ## Contact
 
 Questions about libNeuralFoil are best directed to the [OpenVSP Google Group](https://groups.google.com/g/openvsp).
