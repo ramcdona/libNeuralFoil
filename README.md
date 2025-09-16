@@ -7,6 +7,10 @@ NeuralFoil is a neural network model of airfoil performance trained on a large s
 This library version of NeuralFoil is intended for tight integration into C++ programs without introducing a Python
 dependency on the resulting binary.
 
+libNeuralFoil uses the NeuralFoil model as stored in compressed NumPy data files distributed with the NeuralFoil project.
+[libnpy](https://github.com/matajoh/libnpy) is used to read these files.  libpny uses a bundled version of
+[miniz](https://github.com/richgel999/miniz) to decompress the `*.npz` files.
+
 libNeuralFoil is currently based on NeuralFoil version 0.3.2.  It may be updated in the future as NeuralFoil continues
 to be developed.
 
