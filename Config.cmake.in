@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+include ( "${CMAKE_CURRENT_LIST_DIR}/NeuralFoilTargets.cmake" )
+
+set_target_properties( neuralfoil PROPERTIES
+        RESOURCE_DIR @CMAKE_INSTALL_PREFIX@/share/neuralfoil/resources
+)
