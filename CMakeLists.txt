@@ -9,6 +9,10 @@ ADD_SUBDIRECTORY( external )
 
 ADD_SUBDIRECTORY( src )
 
+IF( LNF_BUILD_TESTS )
+    ADD_SUBDIRECTORY( test )
+ENDIF()
+
 install( EXPORT neuralfoiltargets
         FILE NeuralFoilTargets.cmake
         DESTINATION lib/cmake/NeuralFoil

@@ -47,6 +47,10 @@ your program's installation package.
 get_target_property( neuralfoil_RESOURCE_DIR neuralfoil RESOURCE_DIR )
 ```
 
+##### All project variables:
+
+   - `LNF_BUILD_TESTS` -- Set this variable to enable building some low-level tests.
+
 ## Contact
 
 Questions about libNeuralFoil are best directed to the [OpenVSP Google Group](https://groups.google.com/g/openvsp).
