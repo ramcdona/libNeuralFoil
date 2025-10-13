@@ -6,6 +6,7 @@
 #include <cstdio>
 
 #include "neuralfoil_test.h"
+#include "test_cst.h"
 
 
 int main()
@@ -20,6 +21,13 @@ int main()
     if ( !pass )
     {
         printf( "Neuralfoil test failed!\n" );
+    }
+
+    pass = test_cst();
+
+    if ( !pass )
+    {
+        printf( "CST test failed!\n" );
     }
 
     return pass ? 0 : 1;
