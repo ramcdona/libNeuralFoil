@@ -20,5 +20,5 @@ int main()
         printf( "Neuralfoil test failed!\n" );
     }
 
-    return 0;
+    return pass ? 0 : 1;
 }
