@@ -17,7 +17,7 @@ int main()
 
     if ( !pass )
     {
-        printf( "Test failed!\n" );
+        printf( "Neuralfoil test failed!\n" );
     }
 
     return 0;
