@@ -4,7 +4,9 @@ set( CMAKE_CXX_STANDARD 17 )
 
 add_executable( test
         test.cpp
+        test_helpers.cpp
         neuralfoil_test.cpp
+        test_helpers.h
         neuralfoil_test.h
 )
 

@@ -16,13 +16,6 @@ class neuralfoil_test : public neuralfoil
 public:
 
     bool test() const;
-
-
-protected:
-
-    static bool compare( double x, double xref, bool print = false );
-    static bool compare( const std::vector < double > & x, const std::vector < double > & xref, bool print = false );
-
 };
 
 } // namespace nf

@@ -6,59 +6,10 @@
 #include <cstdio>
 
 #include "neuralfoil_test.h"
+#include "test_helpers.h"
 
 namespace nf
 {
-
-bool neuralfoil_test::compare( const double x, const double xref, const bool print )
-{
-    bool success = true;
-
-    const double err = std::abs( xref - x );
-
-    if ( print )
-    {
-        printf( "%g %g %g\n", xref, x, err );
-    }
-
-    if ( err > 1e-12 )
-    {
-        success = false;
-    }
-
-    printf( "abserr: %g\n", err );
-
-    return success;
-}
-
-bool neuralfoil_test::compare( const std::vector < double > & x, const std::vector < double > & xref, bool print )
-{
-    bool success = true;
-
-    double maxabserr = 0;
-    for( size_t i = 0; i < xref.size(); i++ )
-    {
-        const double err = std::abs( xref[i] - x[i] );
-        if( err > maxabserr )
-        {
-            maxabserr = err;
-        }
-
-        if ( print )
-        {
-            printf( "%ld %g %g %g\n", i, xref[i], x[i], err );
-        }
-    }
-
-    if ( maxabserr > 1e-12 )
-    {
-        success = false;
-    }
-
-    printf( "maxabserr: %g\n", maxabserr );
-
-    return success;
-}
 
 bool neuralfoil_test::test() const
 {
