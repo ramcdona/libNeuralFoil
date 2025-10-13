@@ -1,5 +1,6 @@
 //
-// Created by Rob McDonald on 9/15/25.
+// This file is released under the terms of the MIT License as detailed in the
+// LICENSE.txt file which accompanies this software.
 //
 
 #include <cstdio>
