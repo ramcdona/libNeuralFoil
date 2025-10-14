@@ -203,3 +203,51 @@ void write_matlab_plot( const std::vector < std::vector < double > > &orig, cons
 
     f.close();
 }
+
+void write_matlab( const std::vector < int > &m, const std::string & name )
+{
+    printf( "%s = [", name.c_str() );
+
+    for ( int i = 0; i < m.size(); i++ )
+    {
+        printf( "%d ", m[ i ] );
+    }
+    printf( "];\n" );
+}
+
+void write_matlab( const std::vector < double > &m, const std::string & name )
+{
+    printf( "%s = [", name.c_str() );
+
+    for ( int i = 0; i < m.size(); i++ )
+    {
+        printf( "%.16g ", m[ i ] );
+    }
+    printf( "];\n" );
+}
+
+void write_matlab( const std::vector < std::vector < double > > &m, const std::string & name )
+{
+    printf( "%s = [", name.c_str() );
+
+    int ni = m.size();
+    for ( int i = 0; i < ni; i++ )
+    {
+        int n = m[ i ].size();
+        for ( int j = 0; j < n - 1; j++ )
+        {
+            printf( "%.16g ", m[ i ][ j ] );
+        }
+
+        if ( i < ni - 1 )
+        {
+            printf( "%.16g;", m[ i ][ n - 1 ] );
+        }
+        else
+        {
+            printf( "%.16g", m[ i ][ n - 1 ] );
+        }
+    }
+    printf( "];\n" );
+}
+

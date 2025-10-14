@@ -18,4 +18,10 @@ std::vector < std::vector < double > > generate_NACA4( double m, double p, doubl
 
 void write_matlab_plot( const std::vector < std::vector < double > > &orig, const std::vector < std::vector < double > > &recon, const std::string &fname );
 
+void write_matlab( const std::vector < int > &m, const std::string & name );
+
+void write_matlab( const std::vector < double > &m, const std::string & name );
+
+void write_matlab( const std::vector < std::vector < double > > &m, const std::string & name );
+
 #endif //TEST_HELPERS_H
