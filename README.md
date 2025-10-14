@@ -50,6 +50,7 @@ get_target_property( neuralfoil_RESOURCE_DIR neuralfoil RESOURCE_DIR )
 ##### All project variables:
 
    - `LNF_BUILD_TESTS` -- Set this variable to enable building some low-level tests.
+   - `LNF_BUILD_DOCUMENTATION` -- Set this variable to use Doxygen to build API documentation.
 
 ## Usage
 
