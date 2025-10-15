@@ -13,7 +13,9 @@ int main()
     nf::neuralfoil_test nf;
     nf.load( "nn-xlarge.npz", "scaled_input_distribution.npz" );
 
-    bool pass = nf.test();
+    bool pass = true;
+
+    pass = nf.test();
 
     if ( !pass )
     {
