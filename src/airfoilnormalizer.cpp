@@ -21,7 +21,7 @@ AirfoilNormalizer::AirfoilNormalizer()
     m_Rotate_Deg = 0.0;
 }
 
-void AirfoilNormalizer::normalize_airfoil( std::vector < std::vector < double > > & coords_out, const std::vector < std::vector < double > > &coords_in )
+void AirfoilNormalizer::normalize_airfoil( std::vector < std::vector < double > > & coords_out, const std::vector < std::vector < double > > &coords_in, bool fit_le )
 {
     int n = ( int ) coords_in.size();
 
@@ -29,6 +29,8 @@ void AirfoilNormalizer::normalize_airfoil( std::vector < std::vector < double > 
     double x_te = 0.5 * ( coords_in[ 0 ][ 0 ] + coords_in[ n - 1 ][ 0 ] );
     double y_te = 0.5 * ( coords_in[ 0 ][ 1 ] + coords_in[ n - 1 ][ 1 ] );
 
+    std::vector < double > dvec( n, 0 );
+    std::vector < double > svec( n, 0 );
     // distances to TE, find LE index ( max distance )
     double maxd = -1.0;
     int le_index = 0;
@@ -36,16 +38,60 @@ void AirfoilNormalizer::normalize_airfoil( std::vector < std::vector < double > 
     {
         double dx = coords_in[ i ][ 0 ] - x_te;
         double dy = coords_in[ i ][ 1 ] - y_te;
-        double d = std::sqrt( dx * dx + dy * dy );
-        if ( d > maxd )
+        dvec[ i ] = std::sqrt( dx * dx + dy * dy );
+        if ( dvec[ i ] > maxd )
         {
-            maxd = d;
+            maxd = dvec[ i ];
             le_index = i;
         }
+
+        if ( i > 0)
+        {
+            dx = coords_in[ i ][ 0 ] - coords_in[ i - 1 ][ 0 ];
+            dy = coords_in[ i ][ 1 ] - coords_in[ i - 1 ][ 1 ];
+            double ds = std::sqrt( dx * dx + dy * dy );
+            svec[ i ] = ds + svec[ i - 1 ];
+        }
     }
+
     // translations to move LE to origin
-    m_X_Trans = -coords_in[ le_index ][ 0 ];
-    m_Y_Trans = -coords_in[ le_index ][ 1 ];
+    if ( fit_le )
+    {
+        double dsprev = svec[ le_index - 1 ] - svec[ le_index ];
+        double dsnext = svec[ le_index + 1 ] - svec[ le_index ];
+
+        double dprev = dvec[ le_index - 1 ];
+        double dnext = dvec[ le_index + 1 ];
+        double d = dvec[ le_index ];
+
+        double dscrit, dcrit;
+        quadratic_critical_point( dscrit, dcrit, dsprev, dprev, d, dsnext, dnext );
+
+        double xprev = coords_in[ le_index - 1 ][ 0 ];
+        double x = coords_in[ le_index ][ 0 ];
+        double xnext = coords_in[ le_index + 1 ][ 0 ];
+
+        double xcrit = quadratic_eval( dscrit, dsprev, xprev, x, dsnext, xnext );
+
+        double yprev = coords_in[ le_index - 1 ][ 1 ];
+        double y = coords_in[ le_index ][ 1 ];
+        double ynext = coords_in[ le_index + 1 ][ 1 ];
+
+        double ycrit = quadratic_eval( dscrit, dsprev, yprev, y, dsnext, ynext );
+
+        m_X_Trans = -xcrit;
+        m_Y_Trans = -ycrit;
+
+        double dx = xcrit - x_te;
+        double dy = ycrit - y_te;
+
+        maxd = std::sqrt( dx * dx + dy * dy );
+    }
+    else
+    {
+        m_X_Trans = -coords_in[ le_index ][ 0 ];
+        m_Y_Trans = -coords_in[ le_index ][ 1 ];
+    }
 
     // translate
     std::vector < std::vector < double > > translated = std::vector < std::vector < double > >( n, std::vector < double >( 2, 0 ) );
