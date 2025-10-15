@@ -132,4 +132,34 @@ void solve_least_squares( std::vector < double > &x, const std::vector < std::ve
     solve_linear_system( x, ATA, ATb );
 }
 
+// Fits a quadratic to (x0, y0), (0, y1), (x2, y2), finds the critical point (max/min), and returns (xcrit, ycrit)
+void quadratic_critical_point( double & xcrit, double & ycrit, double x0, double y0, double y1, double x2, double y2 )
+{
+    const double D = x0 * x2 * ( x0 - x2 );
+    const double d0 = y0 - y1;
+    const double d2 = y2 - y1;
+
+    const double a = ( x2 * d0 - x0 * d2 ) / D;
+    const double b = ( x0 * x0 * d2 - x2 * x2 * d0 ) / D;
+    const double c = y1;
+
+    // Critical point (vertex)
+    xcrit = -b / ( 2.0 * a );
+    ycrit = c - ( b * b ) / ( 4.0 * a );
+}
+
+// Fits a quadratic to (x0, y0), (0, y1), (x2, y2), evaluates y(x)
+double quadratic_eval( double x, double x0, double y0, double y1, double x2, double y2 )
+{
+    const double D = x0 * x2 * ( x0 - x2 );
+    const double d0 = y0 - y1;
+    const double d2 = y2 - y1;
+
+    const double a = ( x2 * d0 - x0 * d2 ) / D;
+    const double b = ( x0 * x0 * d2 - x2 * x2 * d0 ) / D;
+    const double c = y1;
+
+    return a * x * x + b * x + c;
+}
+
 } // namespace nf
