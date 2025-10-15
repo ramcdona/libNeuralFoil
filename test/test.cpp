@@ -30,5 +30,7 @@ int main()
         printf( "CST test failed!\n" );
     }
 
+    // test_cst_converge();
+
     return pass ? 0 : 1;
 }

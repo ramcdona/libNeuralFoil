@@ -438,3 +438,113 @@ bool test_cst()
 
     return success;
 }
+
+void test_cst_converge()
+{
+    nf::neuralfoil nf;
+    nf.load( "nn-xlarge.npz", "scaled_input_distribution.npz" );
+
+    double alpha = 5;
+    double Re = 1000000;
+    double n_crit = 9.0;
+    double xtr_upper = 1.0;
+    double xtr_lower = 1.0;
+
+    std::vector < int > num;
+    std::vector < double > dx;
+    std::vector < double > dy;
+    std::vector < double > scale;
+    std::vector < double > rotate;
+
+    std::vector < std::vector < double > > lower_Weights;
+    std::vector < std::vector < double > > upper_Weights;
+    std::vector < double > le_Weight;
+    std::vector < double > te_Thickness;
+
+    std::vector < double > analysis_confidences;
+    std::vector < double > CLs;
+    std::vector < double > CDs;
+    std::vector < double > CMs;
+    std::vector < double > Top_Xtrs;
+    std::vector < double > Bot_Xtrs;
+
+    for ( int n = 50; n <= 250; n += 1 )
+    {
+        double m = 0.04;
+        double p = 0.4;
+        double t = 0.12;
+
+        std::vector < std::vector < double > > raw_coords = generate_NACA4( m, p, t, n );
+
+        nf::AirfoilNormalizer normaf;
+        std::vector < std::vector < double > > coords;
+        normaf.normalize_airfoil( coords, raw_coords, false );
+
+        // Fit Kulfan parameters
+        int n_weights_per_side = 8;
+        nf::KulfanCST cst;
+        cst.fit_kulfan( coords, n_weights_per_side );
+
+        double analysis_confidence;
+        double CL;
+        double CD;
+        double CM;
+        double Top_Xtr;
+        double Bot_Xtr;
+
+        nf.evaluate( analysis_confidence,
+          CL,
+          CD,
+          CM,
+          Top_Xtr,
+          Bot_Xtr,
+          cst.m_Upper_Weights,
+          cst.m_Lower_Weights,
+          cst.m_LE_Weight,
+          cst.m_TE_Thickness,
+           (alpha + normaf.m_Rotate_Deg) * M_PI / 180.0,
+          Re * normaf.m_Scale,
+          n_crit,
+          xtr_upper,
+          xtr_lower );
+
+        num.push_back( n );
+
+        dx.push_back( normaf.m_X_Trans );
+        dy.push_back( normaf.m_Y_Trans );
+        scale.push_back( normaf.m_Scale );
+        rotate.push_back( normaf.m_Rotate_Deg );
+
+        lower_Weights.push_back( cst.m_Lower_Weights );
+        upper_Weights.push_back( cst.m_Upper_Weights );
+        le_Weight.push_back( cst.m_LE_Weight );
+        te_Thickness.push_back( cst.m_TE_Thickness );
+
+        analysis_confidences.push_back( analysis_confidence );
+        CLs.push_back( CL );
+        CDs.push_back( CD );
+        CMs.push_back( CM );
+        Top_Xtrs.push_back( Top_Xtr );
+        Bot_Xtrs.push_back( Bot_Xtr );
+
+    }
+
+    write_matlab( num, "num" );
+
+    write_matlab( dx, "dx" );
+    write_matlab( dy, "dy" );
+    write_matlab( scale, "scale" );
+    write_matlab( rotate, "rotate" );
+
+    write_matlab( lower_Weights, "lower_weights" );
+    write_matlab( upper_Weights, "upper_weights" );
+    write_matlab( le_Weight, "le_weight" );
+    write_matlab( te_Thickness, "te_thickness" );
+
+    write_matlab( analysis_confidences, "analysis_confidence" );
+    write_matlab( CLs, "CL" );
+    write_matlab( CDs, "CD" );
+    write_matlab( CMs, "CM" );
+    write_matlab( Top_Xtrs, "Top_Xtr" );
+    write_matlab( Bot_Xtrs, "Bot_Xtr" );
+}

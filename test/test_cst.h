@@ -8,4 +8,6 @@
 
 bool test_cst();
 
+void test_cst_converge();
+
 #endif //TEST_CST_H
