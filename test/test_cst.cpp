@@ -388,7 +388,7 @@ bool test_cst()
 
     nf::AirfoilNormalizer normaf;
     std::vector < std::vector < double > > coords;
-    normaf.normalize_airfoil( coords, raw_coords );
+    normaf.normalize_airfoil( coords, raw_coords, false );
 
     printf( "Normalization factors\n" );
     if ( !compare( normaf.m_Rotate_Deg, angleref ) ) success = false;
