@@ -21,7 +21,7 @@ AirfoilNormalizer::AirfoilNormalizer()
     m_Rotate_Deg = 0.0;
 }
 
-void AirfoilNormalizer::normalize_airfoil( std::vector < std::vector < double > > & coords_out, const std::vector < std::vector < double > > &coords_in, bool fit_le )
+void AirfoilNormalizer::normalize_airfoil( std::vector < std::vector < double > > & coords_out, std::vector < std::vector < double > > coords_in, bool fit_le )
 {
     int n = ( int ) coords_in.size();
 
@@ -78,6 +78,19 @@ void AirfoilNormalizer::normalize_airfoil( std::vector < std::vector < double > 
         double ynext = coords_in[ le_index + 1 ][ 1 ];
 
         double ycrit = quadratic_eval( dscrit, dsprev, yprev, y, dsnext, ynext );
+
+        std::vector < double > xycrit = { xcrit, ycrit };
+
+        if ( dscrit < 0 )
+        {
+            coords_in.insert( coords_in.begin() + le_index, xycrit );
+            n++;
+        }
+        else if ( dscrit > 0 )
+        {
+            coords_in.insert( coords_in.begin() + le_index + 1, xycrit );
+            n++;
+        }
 
         m_X_Trans = -xcrit;
         m_Y_Trans = -ycrit;

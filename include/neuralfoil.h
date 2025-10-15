@@ -38,7 +38,7 @@ public:
      * @param[in] coords_in Input airfoil coordinates to be normalized
      * @param[in] fit_le Flag to use a quadratic fit to find the LE point
      */
-    void normalize_airfoil( std::vector < std::vector < double > > & coords_out, const std::vector < std::vector < double > > &coords_in, bool fit_le = true );
+    void normalize_airfoil( std::vector < std::vector < double > > & coords_out, std::vector < std::vector < double > > coords_in, bool fit_le = true );
 
     /**
      * @brief Denormalize airfoil coordinates.
