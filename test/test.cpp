@@ -5,18 +5,15 @@
 
 #include <cstdio>
 
-#include "neuralfoil_test.h"
+#include "test_neuralfoil.h"
 #include "test_cst.h"
 
 
 int main()
 {
-    nf::neuralfoil_test nf;
-    nf.load( "nn-xlarge.npz", "scaled_input_distribution.npz" );
-
     bool pass = true;
 
-    pass = nf.test();
+    pass = test_neuralfoil();
 
     if ( !pass )
     {

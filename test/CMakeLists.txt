@@ -6,10 +6,11 @@ add_executable( test
         test.cpp
         test_helpers.cpp
         test_cst.cpp
-        neuralfoil_test.cpp
+        test_neuralfoil.cpp
         test_helpers.h
         test_cst.h
-        neuralfoil_test.h
+        test_neuralfoil.h
+        neuralfoil_public.h
 )
 
 target_link_libraries( test PUBLIC

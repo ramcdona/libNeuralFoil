@@ -5,14 +5,16 @@
 
 #include <cstdio>
 
-#include "neuralfoil_test.h"
+#include "test_neuralfoil.h"
+
+#include "neuralfoil_public.h"
 #include "test_helpers.h"
 
-namespace nf
+bool test_neuralfoil()
 {
+    nf::neuralfoil_public nf;
+    nf.load( "nn-xlarge.npz", "scaled_input_distribution.npz" );
 
-bool neuralfoil_test::test() const
-{
     bool success = true;
     double maxabserr = 0;
 
@@ -426,15 +428,15 @@ bool neuralfoil_test::test() const
 
     std::vector < double > x;
 
-    inputs( x, CST_up, CST_low, CST_le,
-            CST_te, alpha * M_PI / 180.0,
-            Re, n_crit, xtr_upper,
-            xtr_lower );
+    nf.inputs( x, CST_up, CST_low, CST_le,
+               CST_te, alpha * M_PI / 180.0,
+               Re, n_crit, xtr_upper,
+               xtr_lower );
 
     if ( !compare( x, xref ) ) success = false;
 
     std::vector < double > y;
-    net( x, y );
+    nf.net( x, y );
 
     if ( !compare( y, yref ) ) success = false;
 
@@ -442,31 +444,31 @@ bool neuralfoil_test::test() const
     int N_Input = 25;
 
     // This was baked into training in order to ensure the network asymptotes to zero analysis confidence far away from the training data.
-    y[ 0 ] = y[ 0 ] - squared_mahalanobis_distance( x ) / ( 2.0 * N_Input );
+    y[ 0 ] = y[ 0 ] - nf.squared_mahalanobis_distance( x ) / ( 2.0 * N_Input );
 
 
     std::vector < double > xflip;
-    flipx( x, xflip );
+    nf.flipx( x, xflip );
 
 
     if ( !compare( xflip, xrefflip ) ) success = false;
 
     std::vector < double > yflip;
-    net( xflip, yflip );
+    nf.net( xflip, yflip );
 
     if ( !compare( yflip, yrefflip ) ) success = false;
 
     // This was baked into training in order to ensure the network asymptotes to zero analysis confidence far away from the training data.
-    yflip[ 0 ] = yflip[ 0 ] - squared_mahalanobis_distance( xflip ) / ( 2.0 * N_Input );
+    yflip[ 0 ] = yflip[ 0 ] - nf.squared_mahalanobis_distance( xflip ) / ( 2.0 * N_Input );
 
     std::vector < double > yunflip;
 
-    unflipy( yflip, yunflip );
+    nf.unflipy( yflip, yunflip );
 
     if ( !compare( yunflip, yrefunflip ) ) success = false;
 
     std::vector < double > yfuse;
-    fusey( y, yunflip, yfuse );
+    nf.fusey( y, yunflip, yfuse );
 
     if ( !compare( yfuse, yreffuse ) ) success = false;
 
@@ -484,19 +486,19 @@ bool neuralfoil_test::test() const
     std::vector < double > upper_H;
     std::vector < double > lower_H;
 
-    unpacky( yfuse, Re,
-           analysis_confidence,
-           CL,
-           CD,
-           CM,
-           Top_Xtr,
-           Bot_Xtr,
-           upper_bl_ue_over_vinf,
-           lower_bl_ue_over_vinf,
-           upper_theta,
-           lower_theta,
-           upper_H,
-           lower_H );
+    nf.unpacky( yfuse, Re,
+               analysis_confidence,
+               CL,
+               CD,
+               CM,
+               Top_Xtr,
+               Bot_Xtr,
+               upper_bl_ue_over_vinf,
+               lower_bl_ue_over_vinf,
+               upper_theta,
+               lower_theta,
+               upper_H,
+               lower_H );
 
     if ( !compare( analysis_confidence, analysis_confidenceref ) ) success = false;
     if ( !compare( CL, CLref ) ) success = false;
@@ -515,26 +517,26 @@ bool neuralfoil_test::test() const
 
 
     std::vector < double > yeval;
-    evaluate( x, yeval );
+    nf.evaluate( x, yeval );
 
     if ( !compare( yeval, yreffuse ) ) success = false;
 
 
-    evaluate( analysis_confidence,
-              CL,
-              CD,
-              CM,
-              Top_Xtr,
-              Bot_Xtr,
-              CST_up,
-              CST_low,
-              CST_le,
-              CST_te,
-               alpha * M_PI / 180.0,
-              Re,
-              n_crit,
-              xtr_upper,
-              xtr_lower );
+    nf.evaluate( analysis_confidence,
+                 CL,
+                 CD,
+                 CM,
+                 Top_Xtr,
+                 Bot_Xtr,
+                 CST_up,
+                 CST_low,
+                 CST_le,
+                 CST_te,
+                  alpha * M_PI / 180.0,
+                 Re,
+                 n_crit,
+                 xtr_upper,
+                 xtr_lower );
 
     if ( !compare( analysis_confidence, analysis_confidenceref ) ) success = false;
     if ( !compare( CL, CLref ) ) success = false;
@@ -543,27 +545,27 @@ bool neuralfoil_test::test() const
     if ( !compare( Top_Xtr, Top_Xtrref ) ) success = false;
     if ( !compare( Bot_Xtr, Bot_Xtrref ) ) success = false;
 
-    evaluate( analysis_confidence,
-              CL,
-              CD,
-              CM,
-              Top_Xtr,
-              Bot_Xtr,
-              upper_bl_ue_over_vinf,
-           lower_bl_ue_over_vinf,
-           upper_theta,
-           lower_theta,
-           upper_H,
-           lower_H,
-              CST_up,
-              CST_low,
-              CST_le,
-              CST_te,
-               alpha * M_PI / 180.0,
-              Re,
-              n_crit,
-              xtr_upper,
-              xtr_lower );
+    nf.evaluate( analysis_confidence,
+                 CL,
+                 CD,
+                 CM,
+                 Top_Xtr,
+                 Bot_Xtr,
+                 upper_bl_ue_over_vinf,
+                 lower_bl_ue_over_vinf,
+                 upper_theta,
+                 lower_theta,
+                 upper_H,
+                 lower_H,
+                 CST_up,
+                 CST_low,
+                 CST_le,
+                 CST_te,
+                  alpha * M_PI / 180.0,
+                 Re,
+                 n_crit,
+                 xtr_upper,
+                 xtr_lower );
 
     if ( !compare( analysis_confidence, analysis_confidenceref ) ) success = false;
     if ( !compare( CL, CLref ) ) success = false;
@@ -582,5 +584,3 @@ bool neuralfoil_test::test() const
 
     return success;
 }
-
-} // namespace nf
