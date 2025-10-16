@@ -115,20 +115,31 @@ bool compare( const std::vector<std::vector<double>> &X, const std::vector<std::
     return success;
 }
 
-std::vector < std::vector < double > > generate_NACA4( double m, double p, double t, int n_points )
+std::vector < std::vector < double > > generate_NACA4( double m, double p, double t, int n_points, bool cluster )
 {
     // returns 2*n_points x 2 coordinates: upper reversed ( TE->LE ) then lower ( LE->TE )
     if ( n_points < 2 ) throw std::runtime_error( "n_points must be >=2" );
-    std::vector < double > beta( n_points );
-    for ( int i = 0; i < n_points; ++i )
-    {
-        beta[ i ] = double( i ) * M_PI / double( n_points - 1 );
-    }
 
     std::vector < double > x( n_points );
-    for ( int i = 0; i < n_points; ++i )
+    if ( cluster )
     {
-        x[ i ] = 0.5 * ( 1.0 - std::cos( beta[ i ] ) ); // cosine spacing 0..1
+        std::vector < double > beta( n_points );
+        for ( int i = 0; i < n_points; ++i )
+        {
+            beta[ i ] = double( i ) * M_PI / double( n_points - 1 );
+        }
+
+        for ( int i = 0; i < n_points; ++i )
+        {
+            x[ i ] = 0.5 * ( 1.0 - std::cos( beta[ i ] ) ); // cosine spacing 0..1
+        }
+    }
+    else
+    {
+        for ( int i = 0; i < n_points; ++i )
+        {
+            x[ i ] = double( i ) / double( n_points - 1 );
+        }
     }
 
     std::vector < double > y_c( n_points ), dyc_dx( n_points ), y_t( n_points ), theta( n_points );
