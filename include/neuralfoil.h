@@ -12,6 +12,39 @@
 namespace nf
 {
 
+class AirfoilNormalizer
+{
+public:
+    AirfoilNormalizer();
+
+    void normalize_airfoil( std::vector < std::vector < double > > & coords_out, const std::vector < std::vector < double > > &coords_in );
+    void denormalize_airfoil( std::vector < std::vector < double > > & coords_out, const std::vector < std::vector < double > > &coords_in ) const;
+
+    double m_X_Trans;
+    double m_Y_Trans;
+    double m_Scale; // applied scale ( 1/chord )
+    double m_Rotate_Deg; // degrees, CCW positive
+};
+
+class KulfanCST
+{
+public:
+    KulfanCST();
+    void fit_kulfan( const std::vector < std::vector < double > > &coords, int n_weights_per_side = 8 );
+
+    void evaluate_kulfan( std::vector < std::vector < double > > & coords_out, int n_points_per_side ) const;
+
+    std::vector < double > m_Lower_Weights;
+    std::vector < double > m_Upper_Weights;
+    double m_LE_Weight;
+    double m_TE_Thickness;
+    double m_N1;
+    double m_N2;
+
+protected:
+    static double binomial_coefficient( int n, int k );
+};
+
 class neuralfoil
 {
 public:

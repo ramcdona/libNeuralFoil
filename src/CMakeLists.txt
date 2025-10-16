@@ -4,6 +4,8 @@ set( CMAKE_CXX_STANDARD 17 )
 
 add_library( neuralfoil
         neuralfoil.cpp
+        airfoilnormalizer.cpp
+        kulfancst.cpp
         matsolve.cpp
         matsolve.h
 )
