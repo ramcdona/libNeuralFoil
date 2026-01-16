@@ -244,6 +244,9 @@ protected:
     static void plus_equals( std::vector < double > & v, const std::vector < double > & u, double s );
     double squared_mahalanobis_distance( const std::vector < double > & x ) const;
 
+    void mahalanobis_distance_derivatives( std::vector < double > & ddist_dx,
+                                           const std::vector < double > & x ) const;
+
     void net( std::vector < double > x, std::vector < double > & y ) const;
 
     void evaluate( const std::vector < double > & x, std::vector < double > & y ) const;

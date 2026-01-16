@@ -372,6 +372,28 @@ double neuralfoil::squared_mahalanobis_distance( const std::vector < double > & 
     return dist;
 }
 
+void neuralfoil::mahalanobis_distance_derivatives( std::vector < double > & ddist_dx,
+                                                   const std::vector < double > & x ) const
+{
+    const size_t n = x.size();
+    std::vector < double > diff( n );
+    for ( size_t j = 0; j < n; ++j )
+    {
+        diff[ j ] = x[ j ] - m_InputScale[ j ];
+    }
+
+    // Distance is (x-mu)^T * S^-1 * (x-mu).
+    // Since S^-1 is symmetric (covariance inverse), the derivative is 2 * S^-1 * (x-mu).
+    std::vector < double > tmp;
+    multiply( m_InputCovScale, diff, tmp );
+
+    ddist_dx.resize( n );
+    for ( size_t j = 0; j < n; ++j )
+    {
+        ddist_dx[ j ] = 2.0 * tmp[ j ];
+    }
+}
+
 void neuralfoil::net( std::vector < double > x, std::vector < double > & y ) const
 {
 
