@@ -228,6 +228,102 @@ public:
                    const double & xtr_upper = 1.0,
                    const double & xtr_lower = 1.0 ) const;
 
+    /**
+     * @brief Evaluate airfoil aerodynamics and calculate analytical derivatives with detailed boundary layer output.
+     *
+     * Predicts aerodynamic characteristics and boundary layer properties while simultaneously computing the
+     * analytical Jacobian matrix of all outputs with respect to all inputs using the chain rule.
+     *
+     * @param[out] analysis_confidence Confidence level of the analysis (0-1, higher is better)
+     * @param[out] CL Lift coefficient
+     * @param[out] CD Drag coefficient
+     * @param[out] CM Moment coefficient
+     * @param[out] Top_Xtr Transition location on upper surface (x/c)
+     * @param[out] Bot_Xtr Transition location on lower surface (x/c)
+     * @param[out] upper_bl_ue_over_vinf Upper surface boundary layer edge velocity ratio (ue/Vinf)
+     * @param[out] lower_bl_ue_over_vinf Lower surface boundary layer edge velocity ratio (ue/Vinf)
+     * @param[out] upper_theta Upper surface boundary layer momentum thickness
+     * @param[out] lower_theta Lower surface boundary layer momentum thickness
+     * @param[out] upper_H Upper surface boundary layer shape factor
+     * @param[out] lower_H Lower surface boundary layer shape factor
+     * @param[out] jacobian Jacobian matrix [198 x 23].
+     *             Rows (0-197): [confidence, CL, CD, CM, Top_Xtr, Bot_Xtr, upper_ue(32), lower_ue(32), upper_theta(32), lower_theta(32), upper_H(32), lower_H(32)]
+     *             Columns (0-22): [CST_up(8), CST_low(8), CST_le, CST_te, alpha, Re, n_crit, xtr_upper, xtr_lower]
+     * @param[in] CST_up CST weights for upper surface
+     * @param[in] CST_low CST weights for lower surface
+     * @param[in] CST_le Leading edge CST weight
+     * @param[in] CST_te Trailing edge thickness parameter
+     * @param[in] alpharad Angle of attack in radians
+     * @param[in] Re Reynolds number
+     * @param[in] n_crit Transition criterion (Ncrit), default is 9.0
+     * @param[in] xtr_upper Forced transition location on upper surface (x/c), default is 1.0 (free transition)
+     * @param[in] xtr_lower Forced transition location on lower surface (x/c), default is 1.0 (free transition)
+     */
+    void evaluate_with_derivatives( double & analysis_confidence,
+                                    double & CL,
+                                    double & CD,
+                                    double & CM,
+                                    double & Top_Xtr,
+                                    double & Bot_Xtr,
+                                    std::vector < double > & upper_bl_ue_over_vinf,
+                                    std::vector < double > & lower_bl_ue_over_vinf,
+                                    std::vector < double > & upper_theta,
+                                    std::vector < double > & lower_theta,
+                                    std::vector < double > & upper_H,
+                                    std::vector < double > & lower_H,
+                                    std::vector < std::vector < double > > & jacobian,
+                                    const std::vector < double > & CST_up,
+                                    const std::vector < double > & CST_low,
+                                    const double & CST_le,
+                                    const double & CST_te,
+                                    const double & alpharad,
+                                    const double & Re,
+                                    const double & n_crit,
+                                    const double & xtr_upper,
+                                    const double & xtr_lower ) const;
+
+    /**
+     * @brief Evaluate airfoil aerodynamics and calculate analytical derivatives without boundary layer details.
+     *
+     * Predicts integral aerodynamic characteristics and computes the analytical Jacobian matrix
+     * of these scalars with respect to all inputs.
+     *
+     * @param[out] analysis_confidence Confidence level of the analysis (0-1, higher is better)
+     * @param[out] CL Lift coefficient
+     * @param[out] CD Drag coefficient
+     * @param[out] CM Moment coefficient
+     * @param[out] Top_Xtr Transition location on upper surface (x/c)
+     * @param[out] Bot_Xtr Transition location on lower surface (x/c)
+     * @param[out] jacobian Jacobian matrix [6 x 23].
+     *             Rows (0-5): [confidence, CL, CD, CM, Top_Xtr, Bot_Xtr]
+     *             Columns (0-22): [CST_up(8), CST_low(8), CST_le, CST_te, alpha, Re, n_crit, xtr_upper, xtr_lower]
+     * @param[in] CST_up CST weights for upper surface
+     * @param[in] CST_low CST weights for lower surface
+     * @param[in] CST_le Leading edge CST weight
+     * @param[in] CST_te Trailing edge thickness parameter
+     * @param[in] alpharad Angle of attack in radians
+     * @param[in] Re Reynolds number
+     * @param[in] n_crit Transition criterion (Ncrit), default is 9.0
+     * @param[in] xtr_upper Forced transition location on upper surface (x/c), default is 1.0 (free transition)
+     * @param[in] xtr_lower Forced transition location on lower surface (x/c), default is 1.0 (free transition)
+     */
+    void evaluate_with_derivatives( double & analysis_confidence,
+                                        double & CL,
+                                        double & CD,
+                                        double & CM,
+                                        double & Top_Xtr,
+                                        double & Bot_Xtr,
+                                        std::vector < std::vector < double > > & jacobian,
+                                        const std::vector < double > & CST_up,
+                                        const std::vector < double > & CST_low,
+                                        const double & CST_le,
+                                        const double & CST_te,
+                                        const double & alpharad,
+                                        const double & Re,
+                                        const double & n_crit = 9.0,
+                                        const double & xtr_upper = 1.0,
+                                        const double & xtr_lower = 1.0 ) const;
+
 protected:
 
     static double sigmoid( const double x );

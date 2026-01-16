@@ -215,6 +215,52 @@ void neuralfoil::evaluate( double & analysis_confidence,
            lower_H );
 }
 
+void neuralfoil::evaluate_with_derivatives( double & analysis_confidence,
+                                            double & CL,
+                                            double & CD,
+                                            double & CM,
+                                            double & Top_Xtr,
+                                            double & Bot_Xtr,
+                                            std::vector < double > & upper_bl_ue_over_vinf,
+                                            std::vector < double > & lower_bl_ue_over_vinf,
+                                            std::vector < double > & upper_theta,
+                                            std::vector < double > & lower_theta,
+                                            std::vector < double > & upper_H,
+                                            std::vector < double > & lower_H,
+                                            std::vector < std::vector < double > > & jacobian,
+                                            const std::vector < double > & CST_up,
+                                            const std::vector < double > & CST_low,
+                                            const double & CST_le,
+                                            const double & CST_te,
+                                            const double & alpharad,
+                                            const double & Re,
+                                            const double & n_crit,
+                                            const double & xtr_upper,
+                                            const double & xtr_lower ) const
+{
+    std::vector < double > x_net;
+    inputs( x_net, CST_up, CST_low, CST_le, CST_te, alpharad, Re, n_crit, xtr_upper, xtr_lower );
+
+    std::vector < double > y_net;
+    std::vector < std::vector < double > > dy_dx;
+    evaluate_with_derivatives( x_net, y_net, dy_dx );
+
+    unpacky( y_net, Re,
+             analysis_confidence, CL, CD, CM, Top_Xtr, Bot_Xtr,
+             upper_bl_ue_over_vinf, lower_bl_ue_over_vinf,
+             upper_theta, lower_theta, upper_H, lower_H );
+
+    std::vector < std::vector < double > > dx_du;
+    inputs_derivatives( dx_du, alpharad, Re );
+
+    std::vector < std::vector < double > > dyf_dy;
+    unpacky_derivatives( dyf_dy, y_net, Re );
+
+    std::vector < std::vector < double > > dyf_dx;
+    multiply( dyf_dy, dy_dx, dyf_dx );
+    multiply( dyf_dx, dx_du, jacobian );
+}
+
 void neuralfoil::evaluate( double & analysis_confidence,
                double & CL,
                double & CD,
@@ -254,6 +300,47 @@ void neuralfoil::evaluate( double & analysis_confidence,
            CM,
            Top_Xtr,
            Bot_Xtr );
+}
+
+void neuralfoil::evaluate_with_derivatives( double & analysis_confidence,
+                                            double & CL,
+                                            double & CD,
+                                            double & CM,
+                                            double & Top_Xtr,
+                                            double & Bot_Xtr,
+                                            std::vector < std::vector < double > > & jacobian,
+                                            const std::vector < double > & CST_up,
+                                            const std::vector < double > & CST_low,
+                                            const double & CST_le,
+                                            const double & CST_te,
+                                            const double & alpharad,
+                                            const double & Re,
+                                            const double & n_crit,
+                                            const double & xtr_upper,
+                                            const double & xtr_lower ) const
+{
+    std::vector < double > x_net;
+    inputs( x_net, CST_up, CST_low, CST_le, CST_te, alpharad, Re, n_crit, xtr_upper, xtr_lower );
+
+    // Neural Net Derivative (dy/dx)
+    std::vector < double > y_net;
+    std::vector < std::vector < double > > dy_dx;
+    evaluate_with_derivatives( x_net, y_net, dy_dx );
+
+    unpacky( y_net, analysis_confidence, CL, CD, CM, Top_Xtr, Bot_Xtr );
+
+    // Inputs Derivative (dx/du)
+    std::vector < std::vector < double > > dx_du;
+    inputs_derivatives( dx_du, alpharad, Re );
+
+    // 3. Unpacky Derivative (dyf/dy)
+    std::vector < std::vector < double > > dyf_dy;
+    unpacky_derivatives( dyf_dy, y_net );
+
+    // 4. Chain: dy/du = (dyf/dy) * (dy/dx) * (dx/du)
+    std::vector < std::vector < double > > dyf_dx;
+    multiply( dyf_dy, dy_dx, dyf_dx );
+    multiply( dyf_dx, dx_du, jacobian );
 }
 
 double neuralfoil::sigmoid( const double x )
