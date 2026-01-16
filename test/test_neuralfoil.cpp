@@ -510,8 +510,8 @@ bool test_neuralfoil()
 
     if ( !compare( upper_bl_ue_over_vinf, upper_bl_ue_over_vinfref ) ) success = false;
     if ( !compare( lower_bl_ue_over_vinf, lower_bl_ue_over_vinfref ) ) success = false;
-    if ( !compare( upper_theta, upper_thetaref) ) success = false;
-    if ( !compare( lower_theta, lower_thetaref, false ) ) success = false;
+    if ( !compare( upper_theta, upper_thetaref ) ) success = false;
+    if ( !compare( lower_theta, lower_thetaref ) ) success = false;
     if ( !compare( upper_H, upper_Href ) ) success = false;
     if ( !compare( lower_H, lower_Href ) ) success = false;
 
@@ -577,8 +577,8 @@ bool test_neuralfoil()
 
     if ( !compare( upper_bl_ue_over_vinf, upper_bl_ue_over_vinfref ) ) success = false;
     if ( !compare( lower_bl_ue_over_vinf, lower_bl_ue_over_vinfref ) ) success = false;
-    if ( !compare( upper_theta, upper_thetaref) ) success = false;
-    if ( !compare( lower_theta, lower_thetaref, false ) ) success = false;
+    if ( !compare( upper_theta, upper_thetaref ) ) success = false;
+    if ( !compare( lower_theta, lower_thetaref ) ) success = false;
     if ( !compare( upper_H, upper_Href ) ) success = false;
     if ( !compare( lower_H, lower_Href ) ) success = false;
 
