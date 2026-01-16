@@ -11,7 +11,7 @@
 #include <fstream>
 #include <iostream>
 
-bool compare( const double x, const double xref, const bool print )
+bool compare( const double x, const double xref, double tol, const bool print )
 {
     bool success = true;
 
@@ -22,7 +22,7 @@ bool compare( const double x, const double xref, const bool print )
         printf( "%g %g %g\n", xref, x, err );
     }
 
-    if ( err > 1e-12 )
+    if ( err > tol )
     {
         success = false;
     }
@@ -32,7 +32,7 @@ bool compare( const double x, const double xref, const bool print )
     return success;
 }
 
-bool compare( const std::vector < double > & x, const std::vector < double > & xref, bool print )
+bool compare( const std::vector < double > & x, const std::vector < double > & xref, double tol, bool print )
 {
     bool success = true;
 
@@ -57,7 +57,7 @@ bool compare( const std::vector < double > & x, const std::vector < double > & x
         }
     }
 
-    if ( maxabserr > 1e-12 )
+    if ( maxabserr > tol )
     {
         success = false;
     }
@@ -68,7 +68,7 @@ bool compare( const std::vector < double > & x, const std::vector < double > & x
 }
 
 
-bool compare( const std::vector<std::vector<double>> &X, const std::vector<std::vector<double>> &Xref, bool print )
+bool compare( const std::vector<std::vector<double>> &X, const std::vector<std::vector<double>> &Xref, double tol, bool print )
 {
     bool success = true;
 
@@ -99,14 +99,14 @@ bool compare( const std::vector<std::vector<double>> &X, const std::vector<std::
                 maxabserr = err;
             }
 
-            if ( print && err > 1e-12 )
+            if ( print && err > tol )
             {
                 printf("(%zu,%zu) %g %g %g\n", i, j, Xref[i][j], X[i][j], err);
             }
         }
     }
 
-    if ( maxabserr > 1e-12 )
+    if ( maxabserr > tol )
     {
         success = false;
     }
