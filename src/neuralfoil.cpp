@@ -288,6 +288,52 @@ void neuralfoil::multiply( const std::vector < std::vector < double > > & A, std
     }
 }
 
+void neuralfoil::multiply( const std::vector < std::vector < double > > & A, const std::vector < std::vector < double > > & B, std::vector < std::vector < double > > & C )
+{
+    const size_t aRows = A.size();
+    const size_t aCols = A[ 0 ].size();
+    const size_t bCols = B[ 0 ].size();
+
+    C.assign( aRows, std::vector < double > ( bCols, 0.0 ) );
+
+    for ( size_t i = 0; i < aRows; ++i )
+    {
+        for ( size_t k = 0; k < aCols; ++k )
+        {
+            for ( size_t j = 0; j < bCols; ++j )
+            {
+                C[ i ][ j ] += A[ i ][ k ] * B[ k ][ j ];
+            }
+        }
+    }
+}
+
+void neuralfoil::add( const std::vector < std::vector < double > > & A,
+                      const std::vector < std::vector < double > > & B,
+                      std::vector < std::vector < double > > & C )
+{
+    const size_t rows = A.size();
+    const size_t cols = A[ 0 ].size();
+    C.assign( rows, std::vector < double > ( cols, 0.0 ) );
+    for ( size_t i = 0; i < rows; i++ )
+    {
+        for ( size_t j = 0; j < cols; j++ )
+        {
+            C[ i ][ j ] = A[ i ][ j ] + B[ i ][ j ];
+        }
+    }
+}
+
+// v += u * s   where v, u are vectors and s is scalar
+void neuralfoil::plus_equals( std::vector < double > & v, const std::vector < double > & u, const double s )
+{
+    const size_t n = v.size();
+    for ( size_t i = 0; i < n; i++ )
+    {
+        v[ i ] += s * u[ i ];
+    }
+}
+
 double neuralfoil::squared_mahalanobis_distance( const std::vector < double > & x ) const
 {
     const size_t N_inputs = x.size();
