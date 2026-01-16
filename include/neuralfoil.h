@@ -230,7 +230,7 @@ public:
 
 protected:
 
-    static double sigmoid( double x );
+    static double sigmoid( const double x );
     static double swish( double x, double beta = 1.0 );
 
     static void multiply( const std::vector < std::vector < double > > & A, std::vector < double > & B, std::vector < double > & C );
