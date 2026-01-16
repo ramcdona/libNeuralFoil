@@ -637,5 +637,62 @@ bool test_neuralfoil()
     printf( "Jacobian\n" );
     if ( !compare( jacobian, fd_jacobian, 1e-6 ) ) success = false;
 
+
+    // --- Full Evaluate Derivatives (Scalar + Vector) ---
+
+    std::vector < double > u_bl_ue, l_bl_ue, u_theta, l_theta, u_H, l_H;
+    std::vector < std::vector < double > > full_jacobian;
+
+    nf.evaluate_with_derivatives( analysis_confidence, CL, CD, CM, Top_Xtr, Bot_Xtr,
+                                  u_bl_ue, l_bl_ue, u_theta, l_theta, u_H, l_H,
+                                  full_jacobian, CST_up, CST_low, CST_le, CST_te,
+                                  alpha * M_PI / 180.0, Re, n_crit, xtr_upper, xtr_lower );
+
+    auto eval_full = [&]( const std::vector < double > & v ) {
+        std::vector < double > res;
+        double ac, cl, cd, cm, tx, bx;
+        std::vector < double > u_ue, l_ue, u_th, l_th, u_h, l_h;
+        std::vector < double > c_up( v.begin(), v.begin() + 8 );
+        std::vector < double > c_low( v.begin() + 8, v.begin() + 16 );
+
+        // Use the standard evaluation (with flipping) to match the new evaluate_with_derivatives
+        nf.evaluate( ac, cl, cd, cm, tx, bx, u_ue, l_ue, u_th, l_th, u_h, l_h,
+                     c_up, c_low, v[ 16 ], v[ 17 ], v[ 18 ], v[ 19 ], v[ 20 ], v[ 21 ], v[ 22 ] );
+
+        res = { ac, cl, cd, cm, tx, bx };
+        res.insert( res.end(), u_ue.begin(), u_ue.end() );
+        res.insert( res.end(), l_ue.begin(), l_ue.end() );
+        res.insert( res.end(), u_th.begin(), u_th.end() );
+        res.insert( res.end(), l_th.begin(), l_th.end() );
+        res.insert( res.end(), u_h.begin(), u_h.end() );
+        res.insert( res.end(), l_h.begin(), l_h.end() );
+        return res;
+    };
+
+    const size_t n_full_out = 6 + 32 * 6;
+    std::vector < std::vector < double > > fd_full_jacobian( n_full_out, std::vector < double > ( 23, 0.0 ) );
+
+    for ( int j = 0; j < 23; ++j )
+    {
+        std::vector < double > u_plus = u;
+        std::vector < double > u_minus = u;
+        u_plus[ j ] += eps;
+        u_minus[ j ] -= eps;
+
+        auto y_plus = eval_full( u_plus );
+        auto y_minus = eval_full( u_minus );
+
+        for ( size_t i = 0; i < n_full_out; ++i )
+        {
+            fd_full_jacobian[ i ][ j ] = ( y_plus[ i ] - y_minus[ i ] ) / ( 2.0 * eps );
+        }
+    }
+
+    printf( "Full Jacobian (Scalar + Vector outputs)\n" );
+    if ( !compare( full_jacobian, fd_full_jacobian, 1e-6 ) ) success = false;
+
+
+    printf( "\n" );
+
     return success;
 }
