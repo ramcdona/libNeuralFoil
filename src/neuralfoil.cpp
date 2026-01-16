@@ -486,6 +486,55 @@ void neuralfoil::evaluate( const std::vector < double > & x, std::vector < doubl
     fusey( ynormal, yunflip, y );
 }
 
+void neuralfoil::evaluate_with_derivatives( const std::vector < double > & x,
+                                            std::vector < double > & y_fused,
+                                            std::vector < std::vector < double > > & dyfused_dx ) const
+{
+    // forward pass with symmetry logic and its derivatives
+    int N_Input = 25;
+    std::vector < double > y_normal, xflip, yflip, yunflip;
+    std::vector < std::vector < double > > dy_dx, dyflip_dxflip;
+
+    // Normal path
+    net_with_derivatives( x, y_normal, dy_dx );
+
+    // confidence asymptote derivative for normal path
+    y_normal[ 0 ] -= squared_mahalanobis_distance( x ) / ( 2.0 * N_Input );
+
+    std::vector < double > ddist_dx;
+    mahalanobis_distance_derivatives( ddist_dx, x );
+    plus_equals( dy_dx[ 0 ], ddist_dx, -1.0 / ( 2.0 * N_Input ) );
+
+    // Flip path
+    flipx( x, xflip );
+    net_with_derivatives( xflip, yflip, dyflip_dxflip );
+
+    yflip[ 0 ] -= squared_mahalanobis_distance( xflip ) / ( 2.0 * N_Input );
+
+    std::vector < double > ddist_dxflip;
+    mahalanobis_distance_derivatives( ddist_dxflip, xflip );
+    plus_equals( dyflip_dxflip[ 0 ], ddist_dxflip, -1.0 / ( 2.0 * N_Input ) );
+
+    // Calculate y_fused and dy_fused / dx
+    unflipy( yflip, yunflip );
+    fusey( y_normal, yunflip, y_fused );
+
+    // Derivatives of symmetry steps
+    std::vector < std::vector < double > > dxflip_dx, dyunflip_dyflip, dfuse_dy, dfuse_dyunflip;
+    flipx_derivatives( dxflip_dx );
+    unflipy_derivatives( dyunflip_dyflip );
+    fusey_derivatives( dfuse_dy, dfuse_dyunflip, y_normal, yunflip );
+
+    // Combine using chain rule: dyfused/dx = term1 + term2
+    std::vector < std::vector < double > > term1, term2, tmp1, tmp2;
+    multiply( dfuse_dy, dy_dx, term1 );
+    multiply( dfuse_dyunflip, dyunflip_dyflip, tmp1 );
+    multiply( tmp1, dyflip_dxflip, tmp2 );
+    multiply( tmp2, dxflip_dx, term2 );
+
+    add( term1, term2, dyfused_dx );
+}
+
 void neuralfoil::inputs( std::vector < double > & x,
                          const std::vector < double > & CST_up,
                          const std::vector < double > & CST_low,

@@ -256,6 +256,10 @@ protected:
 
     void evaluate( const std::vector < double > & x, std::vector < double > & y ) const;
 
+    void evaluate_with_derivatives( const std::vector < double > & x,
+                                std::vector < double > & y,
+                                std::vector < std::vector < double > > & dy_dx ) const;
+
     static void inputs( std::vector < double > & x,
                         const std::vector < double > & CST_up,
                         const std::vector < double > & CST_low,
