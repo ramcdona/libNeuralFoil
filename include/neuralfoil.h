@@ -268,8 +268,16 @@ protected:
                                     const double & Re );
 
     static void flipx( const std::vector < double > & x, std::vector < double > & xflip );
+    static void flipx_derivatives( std::vector < std::vector < double > > & df_dx );
+
     static void unflipy( const std::vector < double > & y, std::vector < double > & yflip );
+    static void unflipy_derivatives( std::vector < std::vector < double > > & du_dy );
+
     static void fusey( const std::vector < double > & y, const std::vector < double > & yflip, std::vector < double > & yfuse );
+    static void fusey_derivatives( std::vector < std::vector < double > > & dfuse_dy,
+                                   std::vector < std::vector < double > > & dfuse_dyunflip,
+                                   const std::vector < double > & y,
+                                   const std::vector < double > & yunflip );
 
     static void unpacky( const std::vector < double > & y, double Re,
                          double & analysis_confidence,

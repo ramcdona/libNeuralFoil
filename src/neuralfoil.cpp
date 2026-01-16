@@ -509,6 +509,25 @@ void neuralfoil::flipx( const std::vector < double > & x, std::vector < double >
     xflip[ 24 ] = x [ 23 ];  // xtr_lower / xtr_upper
 }
 
+void neuralfoil::flipx_derivatives( std::vector < std::vector < double > > & df_dx )
+{
+    df_dx.assign( 25, std::vector < double > ( 25, 0.0 ) );
+    for ( int i = 0; i < 8; i++ )
+    {
+        df_dx[ i ][ i + 8 ] = -1.0;
+        df_dx[ i + 8 ][ i ] = -1.0;
+    }
+    df_dx[ 16 ][ 16 ] = -1.0;
+    df_dx[ 17 ][ 17 ] = 1.0;
+    df_dx[ 18 ][ 18 ] = -1.0;
+    for ( int i = 19; i <= 22; i++ )
+    {
+        df_dx[ i ][ i ] = 1.0;
+    }
+    df_dx[ 23 ][ 24 ] = 1.0;
+    df_dx[ 24 ][ 23 ] = 1.0;
+}
+
 void neuralfoil::unflipy( const std::vector < double > & y, std::vector < double > & yflip )
 {
     yflip = y;
@@ -538,6 +557,31 @@ void neuralfoil::unflipy( const std::vector < double > & y, std::vector < double
     }
 }
 
+void neuralfoil::unflipy_derivatives( std::vector < std::vector < double > > & du_dy )
+{
+    constexpr int nsurf = 32;
+    constexpr int n_out = 6 + nsurf * 6;
+    du_dy.assign( n_out, std::vector < double > ( n_out, 0.0 ) );
+    du_dy[ 0 ][ 0 ] = 1.0;
+    du_dy[ 1 ][ 1 ] = -1.0;
+    du_dy[ 2 ][ 2 ] = 1.0;
+    du_dy[ 3 ][ 3 ] = -1.0;
+    du_dy[ 4 ][ 5 ] = 1.0;
+    du_dy[ 5 ][ 4 ] = 1.0;
+
+    constexpr int isurf = 6;
+    for ( int i = 0; i < nsurf; i++ )
+    {
+        int j = i + isurf;
+        du_dy[ j ][ j + nsurf * 3 ] = 1.0;
+        du_dy[ j + nsurf ][ j + nsurf * 4 ] = 1.0;
+        du_dy[ j + nsurf * 2 ][ j + nsurf * 5 ] = -1.0;
+        du_dy[ j + nsurf * 3 ][ j ] = 1.0;
+        du_dy[ j + nsurf * 4 ][ j + nsurf ] = 1.0;
+        du_dy[ j + nsurf * 5 ][ j + nsurf * 2 ] = -1.0;
+    }
+}
+
 void neuralfoil::fusey( const std::vector < double > & y, const std::vector < double > & yflip, std::vector < double > & yfuse )
 {
     yfuse.resize( y.size() );
@@ -550,6 +594,37 @@ void neuralfoil::fusey( const std::vector < double > & y, const std::vector < do
     yfuse[ 0 ] = sigmoid( yfuse[ 0 ] );  // Analysis confidence, a binary variable
     yfuse[ 4 ] = std::clamp( yfuse[ 4 ], 0.0, 1.0 );  // Top_Xtr
     yfuse[ 5 ] = std::clamp( yfuse[ 5 ], 0.0, 1.0 );  // Bot_Xtr
+}
+
+void neuralfoil::fusey_derivatives( std::vector < std::vector < double > > & dfuse_dy,
+                                    std::vector < std::vector < double > > & dfuse_dyunflip,
+                                    const std::vector < double > & y,
+                                    const std::vector < double > & yunflip )
+{
+    const size_t n = y.size();
+    dfuse_dy.assign( n, std::vector < double > ( n, 0.0 ) );
+    dfuse_dyunflip.assign( n, std::vector < double > ( n, 0.0 ) );
+
+    for ( size_t i = 0; i < n; i++ )
+    {
+        double val = 0.5;
+        if ( i == 0 )
+        {
+            double dsig;
+            sigmoid_with_derivative( 0.5 * ( y[ 0 ] + yunflip[ 0 ] ), dsig );
+            val = 0.5 * dsig;
+        }
+        else if ( i == 4 || i == 5 )
+        {
+            double fused = 0.5 * ( y[ i ] + yunflip[ i ] );
+            if ( fused < 0.0 || fused > 1.0 )
+            {
+                val = 0.0;
+            }
+        }
+        dfuse_dy[ i ][ i ] = val;
+        dfuse_dyunflip[ i ][ i ] = val;
+    }
 }
 
 void neuralfoil::unpacky( const std::vector < double > & y, const double Re,
