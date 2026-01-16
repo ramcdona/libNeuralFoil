@@ -582,5 +582,60 @@ bool test_neuralfoil()
     if ( !compare( upper_H, upper_Href ) ) success = false;
     if ( !compare( lower_H, lower_Href ) ) success = false;
 
+    // --- Derivative Unit Test ---
+
+    double ac, cl, cd, cm, tx, bx;
+    std::vector < std::vector < double > > jacobian;
+    nf.evaluate_with_derivatives( ac, cl, cd, cm, tx, bx, jacobian, CST_up, CST_low, CST_le, CST_te, alpha * M_PI / 180.0, Re, n_crit, xtr_upper, xtr_lower );
+
+    // Pack inputs for FD perturbation (must match order in evaluate_derivatives)
+    std::vector < double > u = CST_up;
+    u.insert( u.end(), CST_low.begin(), CST_low.end() );
+    u.push_back( CST_le );
+    u.push_back( CST_te );
+    u.push_back( alpha * M_PI / 180.0 );
+    u.push_back( Re );
+    u.push_back( n_crit );
+    u.push_back( xtr_upper );
+    u.push_back( xtr_lower );
+
+    auto eval_u = [&]( const std::vector < double > & v ) {
+        std::vector < double > res;
+        double ac, cl, cd, cm, tx, bx;
+        std::vector < double > c_up( v.begin(), v.begin() + 8 );
+        std::vector < double > c_low( v.begin() + 8, v.begin() + 16 );
+
+        nf.evaluate( ac, cl, cd, cm, tx, bx,
+                     c_up, c_low, v[ 16 ], v[ 17 ], v[ 18 ], v[ 19 ], v[ 20 ], v[ 21 ], v[ 22 ] );
+        res = { ac, cl, cd, cm, tx, bx };
+        return res;
+    };
+
+    double eps = 1e-7;
+    std::vector < std::vector < double > > fd_jacobian( 6, std::vector < double > ( 23, 0.0 ) );
+
+    for ( int j = 0; j < 23; ++j )
+    {
+        std::vector < double > u_plus = u;
+        std::vector < double > u_minus = u;
+        u_plus[ j ] += eps;
+        u_minus[ j ] -= eps;
+
+        auto y_plus = eval_u( u_plus );
+        auto y_minus = eval_u( u_minus );
+
+        for ( int i = 0; i < 6; ++i )
+        {
+            fd_jacobian[ i ][ j ] = ( y_plus[ i ] - y_minus[ i ] ) / ( 2.0 * eps );
+        }
+    }
+
+    // We use a looser tolerance for FD comparison (1e-6) because the FD has inherent error.
+    // In the other tests, we are comparing to reference calculations from Python.  The Python
+    // implementation does not have derivatives, we are instead comparing to a FD approximation
+    // here.
+    printf( "Jacobian\n" );
+    if ( !compare( jacobian, fd_jacobian, 1e-6 ) ) success = false;
+
     return success;
 }
