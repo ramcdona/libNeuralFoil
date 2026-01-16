@@ -418,6 +418,49 @@ void neuralfoil::net( std::vector < double > x, std::vector < double > & y ) con
 
 }
 
+void neuralfoil::net_with_derivatives( std::vector < double > x,
+                                       std::vector < double > & y,
+                                       std::vector < std::vector < double > > & dy_dx ) const
+{
+
+    for ( int ilayer = 0; ilayer < m_Weights.size(); ilayer++ )
+    {
+        multiply( m_Weights[ ilayer ], x, y );
+
+        for ( int i = 0; i < y.size(); i++ )
+        {
+            y[ i ] += m_Biases[ ilayer ][ i ];
+        }
+
+        std::vector < std::vector < double > > dlayer_dprev = m_Weights[ ilayer ];
+
+        if ( ilayer < m_Weights.size() - 1 )
+        {
+            x.resize( y.size() );
+            for ( size_t i = 0; i < y.size(); i++ )
+            {
+                double dsw_dx;
+                x[ i ] = swish_with_derivative( y[ i ], dsw_dx );
+                for ( size_t j = 0; j < dlayer_dprev[ i ].size(); j++ )
+                {
+                    dlayer_dprev[ i ][ j ] *= dsw_dx;
+                }
+            }
+        }
+
+        if ( ilayer == 0 )
+        {
+            dy_dx = dlayer_dprev;
+        }
+        else
+        {
+            std::vector < std::vector < double > > next_J;
+            multiply( dlayer_dprev, dy_dx, next_J );
+            dy_dx = next_J;
+        }
+    }
+}
+
 void neuralfoil::evaluate( const std::vector < double > & x, std::vector < double > & y ) const
 {
     int N_Input = 25;

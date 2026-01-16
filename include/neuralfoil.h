@@ -250,6 +250,10 @@ protected:
 
     void net( std::vector < double > x, std::vector < double > & y ) const;
 
+    void net_with_derivatives( std::vector < double > x,
+                               std::vector < double > & y,
+                               std::vector < std::vector < double > > & dy_dx ) const;
+
     void evaluate( const std::vector < double > & x, std::vector < double > & y ) const;
 
     static void inputs( std::vector < double > & x,
