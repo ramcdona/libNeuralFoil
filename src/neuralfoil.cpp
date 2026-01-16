@@ -469,6 +469,26 @@ void neuralfoil::inputs( std::vector < double > & x,
     x.insert( x.end(), xother.begin(), xother.end() );
 }
 
+void neuralfoil::inputs_derivatives( std::vector < std::vector < double > > & dx_du,
+                                     const double & alpharad,
+                                     const double & Re )
+{
+    dx_du.assign( 25, std::vector < double > ( 23, 0.0 ) );
+    for ( int i = 0; i < 16; ++i )
+    {
+        dx_du[ i ][ i ] = 1.0;                                   // CST_up, CST_low
+    }
+    dx_du[ 16 ][ 16 ] = 1.0;                                     // CST_le
+    dx_du[ 17 ][ 17 ] = 50.0;                                    // CST_te
+    dx_du[ 18 ][ 18 ] = 2.0 * cos( 2.0 * alpharad );             // sin( 2 * alpha )
+    dx_du[ 19 ][ 18 ] = -sin( alpharad );                        // cos( alpha )
+    dx_du[ 20 ][ 18 ] = 2.0 * sin( alpharad ) * cos( alpharad ); // 1 - cos^2( alpha )
+    dx_du[ 21 ][ 19 ] = 1.0 / ( 3.5 * Re );                      // ( log( Re ) - 12.5 ) / 3.5
+    dx_du[ 22 ][ 20 ] = 1.0 / 4.5;                               // ( n_crit - 9.0 ) / 4.5
+    dx_du[ 23 ][ 21 ] = 1.0;                                     // xtr_upper
+    dx_du[ 24 ][ 22 ] = 1.0;                                     // xtr_lower
+}
+
 void neuralfoil::flipx( const std::vector < double > & x, std::vector < double > & xflip )
 {
     // Initialize xflip as copy of x

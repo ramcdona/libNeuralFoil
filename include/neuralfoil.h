@@ -263,6 +263,10 @@ protected:
                         const double & xtr_upper,
                         const double & xtr_lower );
 
+    static void inputs_derivatives( std::vector < std::vector < double > > & dx_du,
+                                    const double & alpharad,
+                                    const double & Re );
+
     static void flipx( const std::vector < double > & x, std::vector < double > & xflip );
     static void unflipy( const std::vector < double > & y, std::vector < double > & yflip );
     static void fusey( const std::vector < double > & y, const std::vector < double > & yflip, std::vector < double > & yfuse );
