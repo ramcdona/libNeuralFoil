@@ -609,4 +609,72 @@ void neuralfoil::unpacky( const std::vector < double > & y,
     Bot_Xtr = y[ 5 ];
 }
 
+void neuralfoil::unpacky_derivatives( std::vector < std::vector < double > > & dyf_dy,
+                                      const std::vector < double > & y_net )
+{
+    dyf_dy.assign( 6, std::vector < double > ( y_net.size(), 0.0 ) );
+    dyf_dy[ 0 ][ 0 ] = 1.0;
+    dyf_dy[ 1 ][ 1 ] = 0.5;
+    double CD_val = exp( ( y_net[ 2 ] - 2.0 ) * 2.0 );
+    dyf_dy[ 2 ][ 2 ] = 2.0 * CD_val;
+    dyf_dy[ 3 ][ 3 ] = 1.0 / 20.0;
+    dyf_dy[ 4 ][ 4 ] = 1.0;
+    dyf_dy[ 5 ][ 5 ] = 1.0;
+}
+
+void neuralfoil::unpacky_derivatives( std::vector < std::vector < double > > & dyf_dy,
+                                      const std::vector < double > & y_net,
+                                      const double Re )
+{
+    const size_t n_out = y_net.size();
+    // Number of scalar outputs (6) + detailed BL outputs (nsurf*6)
+    constexpr int nsurf = 32;
+    dyf_dy.assign( 6 + nsurf * 6, std::vector < double > ( n_out, 0.0 ) );
+
+    // Scalar outputs
+    dyf_dy[ 0 ][ 0 ] = 1.0;
+    dyf_dy[ 1 ][ 1 ] = 0.5;
+    double CD = exp( ( y_net[ 2 ] - 2.0 ) * 2.0 );
+    dyf_dy[ 2 ][ 2 ] = 2.0 * CD;
+    dyf_dy[ 3 ][ 3 ] = 1.0 / 20.0;
+    dyf_dy[ 4 ][ 4 ] = 1.0;
+    dyf_dy[ 5 ][ 5 ] = 1.0;
+
+    // Vector/Surface outputs
+    constexpr int isurf = 6;
+    for ( int i = 0; i < nsurf; i++ )
+    {
+        const int j = i + isurf;
+        const int row_ue_u = 6 + i;
+        const int row_ue_l = 6 + nsurf + i;
+        const int row_theta_u = 6 + nsurf * 2 + i;
+        const int row_theta_l = 6 + nsurf * 3 + i;
+        const int row_H_u = 6 + nsurf * 4 + i;
+        const int row_H_l = 6 + nsurf * 5 + i;
+
+        // upper_bl_ue_over_vinf[i] = y[j + nsurf * 2]
+        dyf_dy[ row_ue_u ][ j + nsurf * 2 ] = 1.0;
+        // lower_bl_ue_over_vinf[i] = y[j + nsurf * 5]
+        dyf_dy[ row_ue_l ][ j + nsurf * 5 ] = 1.0;
+
+        double ue_u = y_net[ j + nsurf * 2 ];
+        double ue_l = y_net[ j + nsurf * 5 ];
+
+        // upper_theta[i] = (pow(10, y[j]) - 0.1) / (abs(ue_u) * Re)
+        double term_u = pow( 10.0, y_net[ j ] );
+        dyf_dy[ row_theta_u ][ j ] = ( log( 10.0 ) * term_u ) / ( abs( ue_u ) * Re );
+        dyf_dy[ row_theta_u ][ j + nsurf * 2 ] = - ( term_u - 0.1 ) / ( ue_u * abs( ue_u ) * Re );
+
+        // lower_theta[i] = (pow(10, y[j + nsurf * 3]) - 0.1) / (abs(ue_l) * Re)
+        double term_l = pow( 10.0, y_net[ j + nsurf * 3 ] );
+        dyf_dy[ row_theta_l ][ j + nsurf * 3 ] = ( log( 10.0 ) * term_l ) / ( abs( ue_l ) * Re );
+        dyf_dy[ row_theta_l ][ j + nsurf * 5 ] = - ( term_l - 0.1 ) / ( ue_l * abs( ue_l ) * Re );
+
+        // upper_H[i] = 2.6 * exp(y[j + nsurf])
+        dyf_dy[ row_H_u ][ j + nsurf ] = 2.6 * exp( y_net[ j + nsurf ] );
+        // lower_H[i] = 2.6 * exp(y[j + nsurf * 4])
+        dyf_dy[ row_H_l ][ j + nsurf * 4 ] = 2.6 * exp( y_net[ j + nsurf * 4 ] );
+    }
+}
+
 } // namespace nf

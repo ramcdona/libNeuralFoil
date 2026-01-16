@@ -293,6 +293,13 @@ protected:
                          double & Top_Xtr,
                          double & Bot_Xtr );
 
+    static void unpacky_derivatives( std::vector < std::vector < double > > & dyf_dy,
+                                     const std::vector < double > & y_net );
+
+    static void unpacky_derivatives( std::vector < std::vector < double > > & dyf_dy,
+                                     const std::vector < double > & y_net,
+                                     double Re );
+
     std::vector < std::vector < std::vector < double > > > m_Weights;
     std::vector < std::vector < double > > m_Biases;
 
