@@ -261,9 +261,25 @@ double neuralfoil::sigmoid( const double x )
     return 1.0 / ( 1.0 + std::exp( -x ) );
 }
 
+double neuralfoil::sigmoid_with_derivative( double x, double & dsigmoid_dx )
+{
+    double s = sigmoid( x );
+    dsigmoid_dx = s * ( 1.0 - s );
+    return s;
+}
+
 double neuralfoil::swish( const double x, const double beta )
 {
     return x * sigmoid( beta * x );
+}
+
+double neuralfoil::swish_with_derivative( double x, double & dsw_dx, double beta )
+{
+    double s = sigmoid( beta * x );
+    double sw = s * x;
+    // swish'(x) = beta * swish(x) + sigmoid(beta * x) * (1 - beta * swish(x))
+    dsw_dx = beta * sw + s * ( 1.0 - beta * sw );
+    return sw;
 }
 
 void neuralfoil::multiply( const std::vector < std::vector < double > > & A, std::vector < double > & B, std::vector < double > & C )

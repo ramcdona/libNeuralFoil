@@ -231,7 +231,9 @@ public:
 protected:
 
     static double sigmoid( const double x );
+    static double sigmoid_with_derivative( double x, double & dsigmoid_dx );
     static double swish( double x, double beta = 1.0 );
+    static double swish_with_derivative( double x, double & dsw_dx, double beta = 1.0 );
 
     static void multiply( const std::vector < std::vector < double > > & A, std::vector < double > & B, std::vector < double > & C );
 
