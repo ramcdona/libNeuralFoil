@@ -8,6 +8,7 @@
 #include <map>
 #include <set>
 #include <filesystem>
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include "npy/tensor.h"
