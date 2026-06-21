@@ -3,10 +3,11 @@
 // LICENSE.txt file which accompanies this software.
 //
 
-#include "matsolve.h"
-
 #define _USE_MATH_DEFINES
 #include <cmath>
+
+#include "matsolve.h"
+
 #include <vector>
 
 #include <algorithm>  // for std::swap

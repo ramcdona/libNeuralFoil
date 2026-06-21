@@ -3,13 +3,14 @@
 // LICENSE.txt file which accompanies this software.
 //
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "../include/neuralfoil.h"
 
 #include <map>
 #include <set>
 #include <filesystem>
-#define _USE_MATH_DEFINES
-#include <cmath>
 
 #include "npy/tensor.h"
 #include "npy/npy.h"

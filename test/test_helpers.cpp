@@ -3,11 +3,12 @@
 // LICENSE.txt file which accompanies this software.
 //
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "test_helpers.h"
 
 #include <cstdio>
-#define _USE_MATH_DEFINES
-#include <cmath>
 #include <vector>
 #include <fstream>
 #include <iostream>

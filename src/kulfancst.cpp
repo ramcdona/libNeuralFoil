@@ -3,12 +3,13 @@
 // LICENSE.txt file which accompanies this software.
 //
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "../include/neuralfoil.h"
 
 #include "matsolve.h"
 
-#define _USE_MATH_DEFINES
-#include <cmath>
 #include <vector>
 
 #include <algorithm>  // for std::swap
